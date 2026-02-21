@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -9,6 +9,7 @@
 
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css">
     <script src="https://tikzjax.com/v1/tikzjax.js"></script>
+    
     <script>
         MathJax = {
             tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
@@ -28,91 +29,107 @@
 
     <div id="THPT" class="tabcontent"></div>
     <div id="DGNL" class="tabcontent"></div>
-
     <button class="reset-btn" onclick="resetProgress()">Xóa lịch sử làm bài</button>
 
     <script>
-        let problemsData = []; // Mảng trống, sẽ được gán dữ liệu từ file JSON
+        let problemsData = [];
 
-        // 1. TẢI DỮ LIỆU TỪ DATA.JSON
         fetch('data.json')
             .then(response => response.json())
-            .then(data => {
-                problemsData = data;
-                renderProblems(); // Chỉ render sau khi đã tải xong dữ liệu
-            })
+            .then(data => { problemsData = data; renderProblems(); })
             .catch(error => console.error("Lỗi tải dữ liệu JSON:", error));
 
-        // 2. QUẢN LÝ TIẾN ĐỘ (LOCALSTORAGE)
-        function getCompletedProblems() {
-            const saved = localStorage.getItem('toan_completed');
-            return saved ? JSON.parse(saved) : [];
-        }
-
+        function getCompletedProblems() { return JSON.parse(localStorage.getItem('toan_completed') || '[]'); }
         function saveCompletedProblem(id) {
             let completed = getCompletedProblems();
-            if (!completed.includes(id)) {
-                completed.push(id);
-                localStorage.setItem('toan_completed', JSON.stringify(completed));
-            }
+            if (!completed.includes(id)) { completed.push(id); localStorage.setItem('toan_completed', JSON.stringify(completed)); }
         }
-
         function resetProgress() {
-            if(confirm("Bạn có chắc muốn xóa toàn bộ lịch sử học tập không?")) {
-                localStorage.removeItem('toan_completed');
-                location.reload();
-            }
+            if(confirm("Bạn có chắc muốn xóa lịch sử không?")) { localStorage.removeItem('toan_completed'); location.reload(); }
         }
 
-        // 3. RENDER GIAO DIỆN
+        // ==========================================
+        // BỘ CHUYỂN ĐỔI LATEX -> HTML THÔNG MINH
+        // ==========================================
+        function formatLaTeX(str) {
+            if (!str) return "";
+
+            // 1. Tự động bọc code TikZ vào thẻ script
+            str = str.replace(/\\begin\{tikzpicture\}([\s\S]*?)\\end\{tikzpicture\}/g, 
+                "<script type='text/tikz'>\\begin{tikzpicture}$1\\end{tikzpicture}<\/script>");
+
+            // 2. Tách và bảo vệ các khối Toán học / TikZ (tránh bị lỗi khi replace)
+            let mathBlocks = [];
+            const mathRegex = /(<script type='text\/tikz'>[\s\S]*?<\/script>|\$\$[\s\S]*?\$\$|\$[\s\S]*?\$|\\begin\{(?:align\*?|equation\*?)\}[\s\S]*?\\end\{(?:align\*?|equation\*?)\})/g;
+            
+            str = str.replace(mathRegex, (match) => {
+                mathBlocks.push(match);
+                return `___MATH___${mathBlocks.length - 1}___`;
+            });
+
+            // 3. Xử lý văn bản thuần LaTeX sang HTML
+            str = str.replace(/\\begin\{itemize\}/g, "<ul style='margin-left: 20px; margin-top: 5px;'>");
+            str = str.replace(/\\end\{itemize\}/g, "</ul>");
+            str = str.replace(/\\item/g, "<li>"); // Đổi \item thành <li>
+            str = str.replace(/\\\\/g, "<br>"); // Dấu \\ biến thành thẻ ngắt dòng
+            str = str.replace(/\n/g, "<br>"); // Xuống dòng bằng phím Enter cũng thành ngắt dòng
+
+            // Dọn dẹp khoảng trắng/ngắt dòng thừa
+            str = str.replace(/(<br>\s*)+/g, "<br>"); 
+            str = str.replace(/<ul><br>/g, "<ul>");
+            str = str.replace(/<\/ul><br>/g, "</ul>");
+            str = str.replace(/<li><br>/g, "<li>");
+
+            // 4. Lắp lại các khối Toán học đã bảo vệ
+            str = str.replace(/___MATH___(\d+)___/g, (match, index) => {
+                return mathBlocks[parseInt(index)];
+            });
+
+            return str;
+        }
+
+        // ==========================================
+        // RENDER GIAO DIỆN
+        // ==========================================
         function renderProblems() {
             const containerTHPT = document.getElementById('THPT');
             const containerDGNL = document.getElementById('DGNL');
             containerTHPT.innerHTML = ''; containerDGNL.innerHTML = '';
-
             const completedIds = getCompletedProblems();
 
             problemsData.forEach(item => {
                 let questionHTML = '';
 
                 if (item.loai_cau === '4_phuong_an') {
-                    const lis = item.lua_chon.map(opt => {
-                        const letter = opt.charAt(0);
-                        return `<li><label><input type="radio" name="q-${item.id}" value="${letter}"> ${opt}</label></li>`;
-                    }).join('');
+                    const lis = item.lua_chon.map(opt => `<li><label><input type="radio" name="q-${item.id}" value="${opt.charAt(0)}"> ${opt}</label></li>`).join('');
                     questionHTML = `<ul class="options-4">${lis}</ul>`;
                 } else if (item.loai_cau === 'dung_sai') {
-                    const rows = item.cac_menh_de.map((md, idx) => `
-                        <tr>
-                            <td>${md.noi_dung}</td>
-                            <td class="center"><input type="radio" name="ds-${item.id}-${idx}" value="true"> Đ</td>
-                            <td class="center"><input type="radio" name="ds-${item.id}-${idx}" value="false"> S</td>
-                        </tr>`).join('');
+                    const rows = item.cac_menh_de.map((md, idx) => `<tr><td>${formatLaTeX(md.noi_dung)}</td><td class="center"><input type="radio" name="ds-${item.id}-${idx}" value="true"> Đ</td><td class="center"><input type="radio" name="ds-${item.id}-${idx}" value="false"> S</td></tr>`).join('');
                     questionHTML = `<table class="table-tf"><tr><th>Mệnh đề</th><th class="center">Đúng</th><th class="center">Sai</th></tr>${rows}</table>`;
                 } else if (item.loai_cau === 'tra_loi_ngan') {
-                    questionHTML = `<input type="text" id="short-${item.id}" class="input-short" placeholder="VD: 12 hoặc e-1">`;
+                    questionHTML = `<input type="text" id="short-${item.id}" class="input-short" placeholder="Nhập đáp án (VD: 12 hoặc e-1)">`;
                 }
 
                 let isCompleted = completedIds.includes(item.id);
                 let cardClass = isCompleted ? "problem-card completed" : "problem-card";
-                let defaultFeedback = isCompleted ? '<span style="color:green;">✅ Bạn đã làm đúng câu này ở lần học trước!</span>' : '';
+                let defaultFb = isCompleted ? '<span style="color:green;">✅ Hoàn thành!</span>' : '';
+                let ytHTML = item.youtube_id ? `<div class="youtube-container"><iframe src="https://www.youtube.com/embed/${item.youtube_id}" allowfullscreen></iframe></div>` : '';
 
-                let youtubeHTML = '';
-                if (item.youtube_id && item.youtube_id !== "") {
-                    youtubeHTML = `<div class="youtube-container"><iframe src="https://www.youtube.com/embed/${item.youtube_id}" allowfullscreen></iframe></div>`;
-                }
+                // Bọc câu hỏi và lời giải qua bộ formatLaTeX
+                const fmtCauHoi = formatLaTeX(item.cau_hoi);
+                const fmtLoiGiai = formatLaTeX(item.loi_giai);
 
                 const cardHTML = `
                     <div id="card-${item.id}" class="${cardClass}">
-                        <div class="question">Bài toán: ${item.cau_hoi} <span class="badge-completed">Đã hoàn thành ✔️</span></div>
+                        <div class="question">Bài toán: ${fmtCauHoi} <span class="badge-completed">Đã hoàn thành ✔️</span></div>
                         ${questionHTML}
                         <div class="btn-group">
                             <button class="check-btn" onclick="checkAnswer('${item.id}', '${item.loai_cau}')">Kiểm tra đáp án</button>
                             <button class="solution-btn" onclick="toggleSolution('${item.id}')">Xem lời giải</button>
-                            <span id="feedback-${item.id}" class="feedback-msg">${defaultFeedback}</span>
+                            <span id="feedback-${item.id}" class="feedback-msg">${defaultFb}</span>
                         </div>
                         <div class="solution-content" id="sol-${item.id}">
-                            <strong>Lời giải chi tiết:</strong><p>${item.loi_giai}</p>${youtubeHTML}
+                            <strong>Lời giải chi tiết:</strong><p>${fmtLoiGiai}</p>${ytHTML}
                         </div>
                     </div>
                 `;
@@ -124,54 +141,51 @@
             if (window.MathJax) MathJax.typesetPromise();
         }
 
-        // 4. KIỂM TRA ĐÁP ÁN
+        // ==========================================
+        // LOGIC CHẤM ĐIỂM (Giữ nguyên)
+        // ==========================================
         function checkAnswer(id, type) {
             const item = problemsData.find(p => p.id === id);
-            const feedbackEl = document.getElementById(`feedback-${id}`);
+            const fbEl = document.getElementById(`feedback-${id}`);
             let isCorrect = false;
 
             if (type === '4_phuong_an') {
-                const selected = document.querySelector(`input[name="q-${id}"]:checked`);
-                if (!selected) return feedbackEl.innerHTML = '<span style="color:orange;">Vui lòng chọn 1 đáp án!</span>';
-                if (selected.value === item.dap_an) isCorrect = true;
+                const sel = document.querySelector(`input[name="q-${id}"]:checked`);
+                if (!sel) return fbEl.innerHTML = '<span style="color:orange;">Vui lòng chọn 1 đáp án!</span>';
+                if (sel.value === item.dap_an) isCorrect = true;
             } else if (type === 'dung_sai') {
                 let correctCount = 0; let allAnswered = true;
                 item.cac_menh_de.forEach((md, idx) => {
-                    const selected = document.querySelector(`input[name="ds-${id}-${idx}"]:checked`);
-                    if (!selected) allAnswered = false;
-                    else { if ((selected.value === 'true') === md.dap_an) correctCount++; }
+                    const sel = document.querySelector(`input[name="ds-${id}-${idx}"]:checked`);
+                    if (!sel) allAnswered = false;
+                    else { if ((sel.value === 'true') === md.dap_an) correctCount++; }
                 });
-                if (!allAnswered) return feedbackEl.innerHTML = '<span style="color:orange;">Vui lòng chọn Đ/S cho tất cả!</span>';
+                if (!allAnswered) return fbEl.innerHTML = '<span style="color:orange;">Vui lòng chọn đủ Đ/S!</span>';
                 if (correctCount === item.cac_menh_de.length) isCorrect = true;
-                else return feedbackEl.innerHTML = `<span style="color:red;">❌ Đúng ${correctCount}/${item.cac_menh_de.length} ý.</span>`;
+                else return fbEl.innerHTML = `<span style="color:red;">❌ Đúng ${correctCount}/${item.cac_menh_de.length} ý.</span>`;
             } else if (type === 'tra_loi_ngan') {
-                const inputVal = document.getElementById(`short-${id}`).value.trim();
-                if (inputVal === '') return feedbackEl.innerHTML = '<span style="color:orange;">Vui lòng nhập đáp án!</span>';
-                if (inputVal.toLowerCase().replace(/\s/g, '') === item.dap_an_ngan.toLowerCase().replace(/\s/g, '')) isCorrect = true;
+                const val = document.getElementById(`short-${id}`).value.trim();
+                if (val === '') return fbEl.innerHTML = '<span style="color:orange;">Vui lòng nhập đáp án!</span>';
+                if (val.toLowerCase().replace(/\s/g, '') === item.dap_an_ngan.toLowerCase().replace(/\s/g, '')) isCorrect = true;
             }
 
             if (isCorrect) {
-                feedbackEl.innerHTML = '<span style="color:green;">✅ Chính xác!</span>';
+                fbEl.innerHTML = '<span style="color:green;">✅ Chính xác!</span>';
                 saveCompletedProblem(id);
                 document.getElementById(`card-${id}`).classList.add('completed');
-            } else {
-                feedbackEl.innerHTML = '<span style="color:red;">❌ Sai rồi, thử lại nhé!</span>';
-            }
+            } else { fbEl.innerHTML = '<span style="color:red;">❌ Sai rồi, thử lại nhé!</span>'; }
         }
 
         function toggleSolution(id) {
-            const solDiv = document.getElementById(`sol-${id}`);
-            solDiv.style.display = solDiv.style.display === "block" ? "none" : "block";
+            const s = document.getElementById(`sol-${id}`);
+            s.style.display = s.style.display === "block" ? "none" : "block";
         }
 
         function openTab(evt, tabName) {
-            let i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) tabcontent[i].style.display = "none";
-            tablinks = document.getElementsByClassName("tablinks");
-            for (i = 0; i < tablinks.length; i++) tablinks[i].className = tablinks[i].className.replace(" active", "");
+            document.querySelectorAll(".tabcontent").forEach(el => el.style.display = "none");
+            document.querySelectorAll(".tablinks").forEach(el => el.classList.remove("active"));
             document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
+            evt.currentTarget.classList.add("active");
         }
 
         document.getElementById("defaultOpen").click();
