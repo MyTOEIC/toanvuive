@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="style.css">
 
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css">
-    <script src="https://tikzjax.com/v1/tikzjax.js"></script>
     
     <script>
         MathJax = {
@@ -36,7 +35,10 @@
 
         fetch('data.json')
             .then(response => response.json())
-            .then(data => { problemsData = data; renderProblems(); })
+            .then(data => { 
+                problemsData = data; 
+                renderProblems(); 
+            })
             .catch(error => console.error("Lỗi tải dữ liệu JSON:", error));
 
         function getCompletedProblems() { return JSON.parse(localStorage.getItem('toan_completed') || '[]'); }
@@ -54,11 +56,9 @@
         function formatLaTeX(str) {
             if (!str) return "";
 
-            // 1. Tự động bọc code TikZ vào thẻ script
             str = str.replace(/\\begin\{tikzpicture\}([\s\S]*?)\\end\{tikzpicture\}/g, 
                 "<script type='text/tikz'>\\begin{tikzpicture}$1\\end{tikzpicture}<\/script>");
 
-            // 2. Tách và bảo vệ các khối Toán học / TikZ (tránh bị lỗi khi replace)
             let mathBlocks = [];
             const mathRegex = /(<script type='text\/tikz'>[\s\S]*?<\/script>|\$\$[\s\S]*?\$\$|\$[\s\S]*?\$|\\begin\{(?:align\*?|equation\*?)\}[\s\S]*?\\end\{(?:align\*?|equation\*?)\})/g;
             
@@ -67,20 +67,17 @@
                 return `___MATH___${mathBlocks.length - 1}___`;
             });
 
-            // 3. Xử lý văn bản thuần LaTeX sang HTML
             str = str.replace(/\\begin\{itemize\}/g, "<ul style='margin-left: 20px; margin-top: 5px;'>");
             str = str.replace(/\\end\{itemize\}/g, "</ul>");
-            str = str.replace(/\\item/g, "<li>"); // Đổi \item thành <li>
-            str = str.replace(/\\\\/g, "<br>"); // Dấu \\ biến thành thẻ ngắt dòng
-            str = str.replace(/\n/g, "<br>"); // Xuống dòng bằng phím Enter cũng thành ngắt dòng
+            str = str.replace(/\\item/g, "<li>"); 
+            str = str.replace(/\\\\/g, "<br>"); 
+            str = str.replace(/\n/g, "<br>"); 
 
-            // Dọn dẹp khoảng trắng/ngắt dòng thừa
             str = str.replace(/(<br>\s*)+/g, "<br>"); 
             str = str.replace(/<ul><br>/g, "<ul>");
             str = str.replace(/<\/ul><br>/g, "</ul>");
             str = str.replace(/<li><br>/g, "<li>");
 
-            // 4. Lắp lại các khối Toán học đã bảo vệ
             str = str.replace(/___MATH___(\d+)___/g, (match, index) => {
                 return mathBlocks[parseInt(index)];
             });
@@ -89,7 +86,7 @@
         }
 
         // ==========================================
-        // RENDER GIAO DIỆN
+        // RENDER GIAO DIỆN VÀ GỌI THƯ VIỆN VẼ
         // ==========================================
         function renderProblems() {
             const containerTHPT = document.getElementById('THPT');
@@ -115,7 +112,6 @@
                 let defaultFb = isCompleted ? '<span style="color:green;">✅ Hoàn thành!</span>' : '';
                 let ytHTML = item.youtube_id ? `<div class="youtube-container"><iframe src="https://www.youtube.com/embed/${item.youtube_id}" allowfullscreen></iframe></div>` : '';
 
-                // Bọc câu hỏi và lời giải qua bộ formatLaTeX
                 const fmtCauHoi = formatLaTeX(item.cau_hoi);
                 const fmtLoiGiai = formatLaTeX(item.loi_giai);
 
@@ -138,11 +134,17 @@
                 else if (item.ky_thi === 'DGNL') containerDGNL.innerHTML += cardHTML;
             });
 
+            // 1. Dịch công thức Toán
             if (window.MathJax) MathJax.typesetPromise();
+
+            // 2. ÉP TIKZJAX CHẠY VÀ VẼ HÌNH NGAY SAU KHI DỮ LIỆU ĐÃ NẠP XONG
+            const tikzScript = document.createElement('script');
+            tikzScript.src = "https://tikzjax.com/v1/tikzjax.js";
+            document.body.appendChild(tikzScript);
         }
 
         // ==========================================
-        // LOGIC CHẤM ĐIỂM (Giữ nguyên)
+        // LOGIC CHẤM ĐIỂM
         // ==========================================
         function checkAnswer(id, type) {
             const item = problemsData.find(p => p.id === id);
