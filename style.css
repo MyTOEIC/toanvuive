@@ -1,0 +1,46 @@
+﻿body { font-family: Arial, sans-serif; max-width: 850px; margin: 0 auto; padding: 20px; background-color: #f4f7f6; line-height: 1.6; }
+h1 { text-align: center; color: #333; }
+
+/* Tabs */
+.tab { overflow: hidden; border-bottom: 2px solid #ccc; margin-bottom: 20px; display: flex; justify-content: center; }
+.tab button { background-color: inherit; float: left; border: none; outline: none; cursor: pointer; padding: 14px 30px; transition: 0.3s; font-size: 1.1em; font-weight: bold; color: #666; }
+.tab button:hover { color: #007bff; }
+.tab button.active { border-bottom: 3px solid #007bff; color: #007bff; }
+.tabcontent { display: none; animation: fadeEffect 0.5s; }
+@keyframes fadeEffect { from {opacity: 0;} to {opacity: 1;} }
+
+/* Card Bài tập */
+.problem-card { background: #fff; padding: 25px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+.problem-card.completed { border: 2px solid #28a745; background-color: #f4fff6; }
+.question { font-weight: bold; font-size: 1.1em; margin-bottom: 15px; }
+
+/* Các dạng câu hỏi */
+.options-4 { margin-bottom: 15px; list-style-type: none; padding: 0; }
+.options-4 label { display: block; padding: 10px; background: #f8f9fa; border-radius: 5px; cursor: pointer; transition: 0.2s; margin-bottom: 8px; }
+.options-4 label:hover { background: #e2e6ea; }
+
+.table-tf { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+.table-tf th, .table-tf td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+.table-tf th { background-color: #f2f2f2; }
+.table-tf td.center { text-align: center; width: 60px; }
+
+.input-short { width: 100%; padding: 10px; font-size: 1em; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+
+/* Nút bấm & Trạng thái */
+.btn-group { display: flex; gap: 10px; margin-top: 10px; align-items: center; }
+.check-btn { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+.check-btn:hover { background: #0056b3; }
+.solution-btn { background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+.solution-btn:hover { background: #5a6268; }
+.reset-btn { display: block; margin: 20px auto; padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+.reset-btn:hover { background: #c82333; }
+
+.feedback-msg { font-weight: bold; margin-left: 10px; }
+.badge-completed { background: #28a745; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.8em; margin-left: 10px; vertical-align: middle; display: none; }
+.problem-card.completed .badge-completed { display: inline-block; }
+
+.solution-content { display: none; margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ccc; background: #fdfdfd; padding: 15px; border-radius: 5px; }
+
+/* YouTube Container */
+.youtube-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-top: 15px; border-radius: 8px;}
+.youtube-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }

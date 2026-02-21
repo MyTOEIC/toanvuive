@@ -1,0 +1,180 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ngân Hàng Toán THPT & ĐGNL</title>
+    
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css">
+    <script src="https://tikzjax.com/v1/tikzjax.js"></script>
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+
+    <h1>Hệ Thống Luyện Thi Toán</h1>
+
+    <div class="tab">
+        <button class="tablinks active" onclick="openTab(event, 'THPT')" id="defaultOpen">Kỳ thi THPT Quốc Gia</button>
+        <button class="tablinks" onclick="openTab(event, 'DGNL')">Đánh Giá Năng Lực</button>
+    </div>
+
+    <div id="THPT" class="tabcontent"></div>
+    <div id="DGNL" class="tabcontent"></div>
+
+    <button class="reset-btn" onclick="resetProgress()">Xóa lịch sử làm bài</button>
+
+    <script>
+        let problemsData = []; // Mảng trống, sẽ được gán dữ liệu từ file JSON
+
+        // 1. TẢI DỮ LIỆU TỪ DATA.JSON
+        fetch('data.json')
+            .then(response => response.json())
+            .then(data => {
+                problemsData = data;
+                renderProblems(); // Chỉ render sau khi đã tải xong dữ liệu
+            })
+            .catch(error => console.error("Lỗi tải dữ liệu JSON:", error));
+
+        // 2. QUẢN LÝ TIẾN ĐỘ (LOCALSTORAGE)
+        function getCompletedProblems() {
+            const saved = localStorage.getItem('toan_completed');
+            return saved ? JSON.parse(saved) : [];
+        }
+
+        function saveCompletedProblem(id) {
+            let completed = getCompletedProblems();
+            if (!completed.includes(id)) {
+                completed.push(id);
+                localStorage.setItem('toan_completed', JSON.stringify(completed));
+            }
+        }
+
+        function resetProgress() {
+            if(confirm("Bạn có chắc muốn xóa toàn bộ lịch sử học tập không?")) {
+                localStorage.removeItem('toan_completed');
+                location.reload();
+            }
+        }
+
+        // 3. RENDER GIAO DIỆN
+        function renderProblems() {
+            const containerTHPT = document.getElementById('THPT');
+            const containerDGNL = document.getElementById('DGNL');
+            containerTHPT.innerHTML = ''; containerDGNL.innerHTML = '';
+
+            const completedIds = getCompletedProblems();
+
+            problemsData.forEach(item => {
+                let questionHTML = '';
+
+                if (item.loai_cau === '4_phuong_an') {
+                    const lis = item.lua_chon.map(opt => {
+                        const letter = opt.charAt(0);
+                        return `<li><label><input type="radio" name="q-${item.id}" value="${letter}"> ${opt}</label></li>`;
+                    }).join('');
+                    questionHTML = `<ul class="options-4">${lis}</ul>`;
+                } else if (item.loai_cau === 'dung_sai') {
+                    const rows = item.cac_menh_de.map((md, idx) => `
+                        <tr>
+                            <td>${md.noi_dung}</td>
+                            <td class="center"><input type="radio" name="ds-${item.id}-${idx}" value="true"> Đ</td>
+                            <td class="center"><input type="radio" name="ds-${item.id}-${idx}" value="false"> S</td>
+                        </tr>`).join('');
+                    questionHTML = `<table class="table-tf"><tr><th>Mệnh đề</th><th class="center">Đúng</th><th class="center">Sai</th></tr>${rows}</table>`;
+                } else if (item.loai_cau === 'tra_loi_ngan') {
+                    questionHTML = `<input type="text" id="short-${item.id}" class="input-short" placeholder="VD: 12 hoặc e-1">`;
+                }
+
+                let isCompleted = completedIds.includes(item.id);
+                let cardClass = isCompleted ? "problem-card completed" : "problem-card";
+                let defaultFeedback = isCompleted ? '<span style="color:green;">✅ Bạn đã làm đúng câu này ở lần học trước!</span>' : '';
+
+                let youtubeHTML = '';
+                if (item.youtube_id && item.youtube_id !== "") {
+                    youtubeHTML = `<div class="youtube-container"><iframe src="https://www.youtube.com/embed/${item.youtube_id}" allowfullscreen></iframe></div>`;
+                }
+
+                const cardHTML = `
+                    <div id="card-${item.id}" class="${cardClass}">
+                        <div class="question">Bài toán: ${item.cau_hoi} <span class="badge-completed">Đã hoàn thành ✔️</span></div>
+                        ${questionHTML}
+                        <div class="btn-group">
+                            <button class="check-btn" onclick="checkAnswer('${item.id}', '${item.loai_cau}')">Kiểm tra đáp án</button>
+                            <button class="solution-btn" onclick="toggleSolution('${item.id}')">Xem lời giải</button>
+                            <span id="feedback-${item.id}" class="feedback-msg">${defaultFeedback}</span>
+                        </div>
+                        <div class="solution-content" id="sol-${item.id}">
+                            <strong>Lời giải chi tiết:</strong><p>${item.loi_giai}</p>${youtubeHTML}
+                        </div>
+                    </div>
+                `;
+
+                if (item.ky_thi === 'THPT') containerTHPT.innerHTML += cardHTML;
+                else if (item.ky_thi === 'DGNL') containerDGNL.innerHTML += cardHTML;
+            });
+
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        // 4. KIỂM TRA ĐÁP ÁN
+        function checkAnswer(id, type) {
+            const item = problemsData.find(p => p.id === id);
+            const feedbackEl = document.getElementById(`feedback-${id}`);
+            let isCorrect = false;
+
+            if (type === '4_phuong_an') {
+                const selected = document.querySelector(`input[name="q-${id}"]:checked`);
+                if (!selected) return feedbackEl.innerHTML = '<span style="color:orange;">Vui lòng chọn 1 đáp án!</span>';
+                if (selected.value === item.dap_an) isCorrect = true;
+            } else if (type === 'dung_sai') {
+                let correctCount = 0; let allAnswered = true;
+                item.cac_menh_de.forEach((md, idx) => {
+                    const selected = document.querySelector(`input[name="ds-${id}-${idx}"]:checked`);
+                    if (!selected) allAnswered = false;
+                    else { if ((selected.value === 'true') === md.dap_an) correctCount++; }
+                });
+                if (!allAnswered) return feedbackEl.innerHTML = '<span style="color:orange;">Vui lòng chọn Đ/S cho tất cả!</span>';
+                if (correctCount === item.cac_menh_de.length) isCorrect = true;
+                else return feedbackEl.innerHTML = `<span style="color:red;">❌ Đúng ${correctCount}/${item.cac_menh_de.length} ý.</span>`;
+            } else if (type === 'tra_loi_ngan') {
+                const inputVal = document.getElementById(`short-${id}`).value.trim();
+                if (inputVal === '') return feedbackEl.innerHTML = '<span style="color:orange;">Vui lòng nhập đáp án!</span>';
+                if (inputVal.toLowerCase().replace(/\s/g, '') === item.dap_an_ngan.toLowerCase().replace(/\s/g, '')) isCorrect = true;
+            }
+
+            if (isCorrect) {
+                feedbackEl.innerHTML = '<span style="color:green;">✅ Chính xác!</span>';
+                saveCompletedProblem(id);
+                document.getElementById(`card-${id}`).classList.add('completed');
+            } else {
+                feedbackEl.innerHTML = '<span style="color:red;">❌ Sai rồi, thử lại nhé!</span>';
+            }
+        }
+
+        function toggleSolution(id) {
+            const solDiv = document.getElementById(`sol-${id}`);
+            solDiv.style.display = solDiv.style.display === "block" ? "none" : "block";
+        }
+
+        function openTab(evt, tabName) {
+            let i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) tabcontent[i].style.display = "none";
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) tablinks[i].className = tablinks[i].className.replace(" active", "");
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+        document.getElementById("defaultOpen").click();
+    </script>
+</body>
+</html>

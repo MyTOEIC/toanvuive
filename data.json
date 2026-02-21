@@ -1,0 +1,21 @@
+﻿[
+  {
+    "id": "bai-01",
+    "ky_thi": "THPT",
+    "loai_cau": "4_phuong_an",
+    "cau_hoi": "Cho hàm số $y = -x^3 + 3x - 2$. Giá trị cực đại của hàm số là bao nhiêu?",
+    "lua_chon": ["A. 0", "B. 2", "C. -2", "D. -4"],
+    "dap_an": "A",
+    "loi_giai": "Đạo hàm $y' = -3x^2 + 3$. Nghiệm $y'=0$ là $x = \\pm 1$. Bảng biến thiên cho thấy cực đại đạt tại $x = 1$, suy ra $y_{CĐ} = 0$.",
+    "youtube_id": ""
+  },
+  {
+    "id": "bai-02",
+    "ky_thi": "DGNL",
+    "loai_cau": "tra_loi_ngan",
+    "cau_hoi": "Tính tích phân $I = \\int_0^1 e^x dx$. (Điền đáp án chính xác)",
+    "dap_an_ngan": "e-1",
+    "loi_giai": "$I = e^x \\Big|_0^1 = e^1 - e^0 = e - 1$.",
+    "youtube_id": ""
+  }
+]
