@@ -72,7 +72,7 @@
   "id": "bai-1771769715040",
   "ky_thi": "THPT",
   "loai_cau": "tra_loi_ngan",
-  "cau_hoi": "Trong không gian tọa độ $Oxyz$, cho đường thẳng $(\\Delta)$ là giao tuyến của hai mặt phẳng $(\\alpha):2x - 3z + 5 = 0$ và $(\\beta): x-2y+z-3=0$. Biết vectơ $\\Vec{u} = (a ; b; - 12)$ là một vectơ chỉ phương của đường thẳng $(\\Delta)$, hãy tính tổng $a + b$.",
+  "cau_hoi": "Trong không gian tọa độ $Oxyz$, cho đường thẳng $(\\Delta)$ là giao tuyến của hai mặt phẳng $(\\alpha):2x - 3z + 5 = 0$ và $(\\beta): x-2y+z-3=0$. Biết vectơ $\\overrightarrow{u} = (a ; b; - 12)$ là một vectơ chỉ phương của đường thẳng $(\\Delta)$, hãy tính tổng $a + b$.",
   "dap_an_ngan": "-33",
   "loi_giai": "Từ giả thiết ta có \n\\begin{align*}\n\\Vec{u} = [\\overrightarrow{n_\\alpha}, \\overrightarrow{n_\\beta}] = (-6;-5;-4) \\parallel (a;b;-12) \\implies \\begin{cases}\na=-18 \\\\\nb=15\n\\end{cases} \\implies a+b=-33\n\\end{align*}",
   "youtube_id": ""
@@ -87,4 +87,5 @@
   "youtube_id": ""
 }
 ]
+
 
