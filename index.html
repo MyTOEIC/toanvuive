@@ -3,13 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ngân Hàng Toán THPT & ĐGNL</title>
-    
+    <title>Làm Bài Chi Tiết</title>
     <link rel="stylesheet" href="style.css">
-
-    <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css">
-    <script src="https://tikzjax.com/v1/tikzjax.js"></script>
-
     <script>
         window.MathJax = {
             tex: { 
@@ -17,39 +12,24 @@
                 displayMath: [['$$', '$$'], ['\\[', '\\]']],
                 processEscapes: true,
                 processEnvironments: true,
-                tags: 'ams' // Hỗ trợ đánh số phương trình tự động
+                tags: 'ams'
             },
-            options: {
-                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-            },
+            options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] },
             svg: { fontCache: 'global' }
         };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
-
     <div class="container">
-        <div class="header">
-            <h1>Hệ Thống Luyện Thi Toán</h1>
-            <p>Ôn luyện toàn diện THPT Quốc Gia & Đánh Giá Năng Lực</p>
-        </div>
-
-        <div class="tab">
-            <button class="tablinks active" onclick="openTab(event, 'THPT')" id="defaultOpen">Kỳ thi THPT Quốc Gia</button>
-            <button class="tablinks" onclick="openTab(event, 'DGNL')">Đánh Giá Năng Lực</button>
-        </div>
-
-        <button class="reset-btn" onclick="resetProgress()" style="display: block; margin: 0 auto 20px auto; background: #e2e8f0; color: #475569; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 14px;">Xóa lịch sử làm bài</button>
-
-        <div id="THPT" class="tabcontent"></div>
-        <div id="DGNL" class="tabcontent"></div>
+        <a href="index.html" class="back-btn">← Trở về danh sách</a>
+        <div id="noidung-hienthi"><h2 style="text-align:center;">Đang tải nội dung...</h2></div>
     </div>
 
     <script>
-        let problemsData = []; 
+        let currentProblem = null;
 
-        // --- HÀM DỊCH TEXT LATEX SANG HTML (itemize, enumerate) ---
+        // Hàm dịch danh sách LaTeX (Đã bỏ lệnh replace \ thành <br> gây lỗi)
         function parseLaTeXText(text) {
             if (!text) return "";
             return text
@@ -57,199 +37,144 @@
                 .replace(/\\end\{itemize\}/g, "</ul>")
                 .replace(/\\begin\{enumerate\}/g, "<ol class='latex-list' style='margin-left: 20px; margin-bottom: 10px;'>")
                 .replace(/\\end\{enumerate\}/g, "</ol>")
-                .replace(/\\item/g, "<li>")
-                .replace(/\\\\/g, "<br>"); // Dịch dấu xuống dòng của LaTeX
+                .replace(/\\item/g, "<li>");
         }
 
-        // --- TẢI DỮ LIỆU JSON ---
-        fetch('data.json')
-            .then(response => response.json())
-            .then(data => {
-                problemsData = data;
-                renderProblems(); 
-            })
-            .catch(error => console.error("Lỗi tải dữ liệu JSON:", error));
+        const urlParams = new URLSearchParams(window.location.search);
+        const baiId = urlParams.get('id');
 
-        // --- QUẢN LÝ TIẾN ĐỘ LÀM BÀI ---
-        function getCompletedProblems() {
-            const saved = localStorage.getItem('toan_completed');
-            return saved ? JSON.parse(saved) : [];
+        if (!baiId) {
+            document.getElementById('noidung-hienthi').innerHTML = '<h2>❌ Liên kết không hợp lệ!</h2>';
+        } else {
+            fetch('data.json')
+                .then(res => res.json())
+                .then(data => {
+                    currentProblem = data.find(item => item.id === baiId);
+                    if (currentProblem) renderGiaoDien(currentProblem);
+                    else document.getElementById('noidung-hienthi').innerHTML = '<h2>❌ Không tìm thấy bài toán.</h2>';
+                });
         }
 
-        function saveCompletedProblem(id) {
-            let completed = getCompletedProblems();
-            if (!completed.includes(id)) {
-                completed.push(id);
-                localStorage.setItem('toan_completed', JSON.stringify(completed));
+        function renderGiaoDien(baiToan) {
+            let formKiemTra = '';
+            const cauHoiDaXuLy = parseLaTeXText(baiToan.cau_hoi);
+            const loiGiaiDaXuLy = parseLaTeXText(baiToan.loi_giai);
+
+            // Dạng 1: 4 Phương án
+            if (baiToan.loai_cau === '4_phuong_an') {
+                const lis = baiToan.lua_chon.map(opt => {
+                    const letter = opt.charAt(0);
+                    const textDaXuLy = parseLaTeXText(opt.substring(3));
+                    return `<li style="list-style:none; margin-bottom:8px;">
+                                <label style="cursor:pointer; display:block; padding:15px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:5px;">
+                                    <input type="radio" name="q" value="${letter}" style="transform: scale(1.2); margin-right:8px;"> 
+                                    <b>${letter}.</b> ${textDaXuLy}
+                                </label>
+                            </li>`;
+                }).join('');
+                formKiemTra = `<div class="answer-section"><h3>Chọn đáp án đúng:</h3><ul class="options-4" style="padding:0;">${lis}</ul></div>`;
+            } 
+            // Dạng 2: Đúng/Sai
+            else if (baiToan.loai_cau === 'dung_sai') {
+                const rows = baiToan.cac_menh_de.map((md, idx) => {
+                    const mdDaXuLy = parseLaTeXText(md.noi_dung);
+                    return `<tr>
+                                <td style="padding:12px; border:1px solid #e2e8f0;">${mdDaXuLy}</td>
+                                <td style="text-align:center; border:1px solid #e2e8f0;"><input type="radio" name="ds-${idx}" value="true" style="transform: scale(1.3);"> Đ</td>
+                                <td style="text-align:center; border:1px solid #e2e8f0;"><input type="radio" name="ds-${idx}" value="false" style="transform: scale(1.3);"> S</td>
+                            </tr>`;
+                }).join('');
+                formKiemTra = `<div class="answer-section"><h3>Chọn Đúng/Sai:</h3>
+                               <table class="table-tf" style="width:100%; border-collapse:collapse; background:white;">
+                                  <tr style="background:#3b82f6; color:white;">
+                                      <th style="padding:12px; border:1px solid #e2e8f0; text-align:left;">Mệnh đề</th>
+                                      <th style="padding:12px; border:1px solid #e2e8f0; width:60px;">Đúng</th>
+                                      <th style="padding:12px; border:1px solid #e2e8f0; width:60px;">Sai</th>
+                                  </tr>${rows}
+                               </table></div>`;
+            } 
+            // Dạng 3: Trả lời ngắn
+            else if (baiToan.loai_cau === 'tra_loi_ngan') {
+                formKiemTra = `<div class="answer-section"><h3>Nhập đáp án của bạn:</h3>
+                               <input type="text" id="user-answer" class="input-short" placeholder="Nhập kết quả..." style="width:100%; padding:14px; border:2px solid #e2e8f0; border-radius:8px; font-size:16px;"></div>`;
             }
-        }
 
-        function resetProgress() {
-            if(confirm("Bạn có chắc muốn xóa toàn bộ lịch sử học tập không?")) {
-                localStorage.removeItem('toan_completed');
-                location.reload();
-            }
-        }
+            let youtubeHTML = (baiToan.youtube_id && baiToan.youtube_id !== "") 
+                ? `<div class="video-container" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; margin-top:20px;">
+                       <iframe style="position:absolute; top:0; left:0; width:100%; height:100%;" src="https://www.youtube.com/embed/${baiToan.youtube_id}" allowfullscreen></iframe>
+                   </div>` : '';
 
-        // --- RENDER BÀI TOÁN RA MÀN HÌNH ---
-        function renderProblems() {
-            const containerTHPT = document.getElementById('THPT');
-            const containerDGNL = document.getElementById('DGNL');
-            containerTHPT.innerHTML = ''; 
-            containerDGNL.innerHTML = '';
-
-            const completedIds = getCompletedProblems();
-
-            problemsData.forEach(item => {
-                let questionHTML = '';
+            document.getElementById('noidung-hienthi').innerHTML = `
+                <div class="content-box" style="background:white; padding:32px; border-radius:12px; border:1px solid #e2e8f0; box-shadow:0 4px 6px rgba(0,0,0,0.05); margin-bottom:24px;">
+                    <div class="badges"><span class="badge badge-blue">${baiToan.ky_thi}</span></div>
+                    <h2 class="question-title" style="margin-top:10px; margin-bottom:20px; border-bottom:2px solid #e2e8f0; padding-bottom:10px;">Nội dung bài toán</h2>
+                    <div class="question-content" style="font-size:1.1rem;">${cauHoiDaXuLy}</div>
+                </div>
                 
-                // Tiền xử lý văn bản LaTeX cho câu hỏi và lời giải
-                const cauHoiDaXuLy = parseLaTeXText(item.cau_hoi);
-                const loiGiaiDaXuLy = parseLaTeXText(item.loi_giai);
+                ${formKiemTra}
+                
+                <div style="display:flex; gap:10px; margin-bottom:24px;">
+                    <button class="btn-check" onclick="checkAnswer()" style="flex:1; background:#10b981; color:white; border:none; padding:14px; border-radius:8px; font-weight:bold; cursor:pointer;">Kiểm Tra Đáp Án</button>
+                    <button class="btn-solve" onclick="toggleSolution()" style="flex:1; background:#3b82f6; color:white; border:none; padding:14px; border-radius:8px; font-weight:bold; cursor:pointer;">Xem Lời Giải</button>
+                </div>
+                
+                <div id="feedback-msg" class="feedback-msg" style="margin-bottom:20px; text-align:center; font-size:1.1rem; font-weight:bold;"></div>
+                
+                <div id="loi-giai" class="solution-box" style="display:none; background:#f0fdf4; border-left:4px solid #10b981; padding:24px; border-radius:0 8px 8px 0;">
+                    <h3 style="color:#10b981; margin-bottom:15px;">Thông tin chi tiết</h3>
+                    <div class="solution-content">${loiGiaiDaXuLy}</div>
+                    ${youtubeHTML}
+                </div>
+            `;
 
-                // --- GIAO DIỆN: 3 DẠNG CÂU HỎI ---
-                // Dạng 1: Trắc nghiệm 4 phương án
-                if (item.loai_cau === '4_phuong_an') {
-                    const lis = item.lua_chon.map(opt => {
-                        const letter = opt.charAt(0); // Lấy chữ A, B, C, D
-                        const textDaXuLy = parseLaTeXText(opt.substring(3)); // Lấy phần nội dung sau "A. "
-                        return `<li style="list-style:none; margin-bottom:8px;">
-                                    <label style="cursor:pointer; display:block; padding:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:5px;">
-                                        <input type="radio" name="q-${item.id}" value="${letter}" style="transform: scale(1.2); margin-right:8px;"> 
-                                        <b>${letter}.</b> ${textDaXuLy}
-                                    </label>
-                                </li>`;
-                    }).join('');
-                    questionHTML = `<ul class="options-4" style="padding:0;">${lis}</ul>`;
-                } 
-                // Dạng 2: Trắc nghiệm Đúng/Sai
-                else if (item.loai_cau === 'dung_sai') {
-                    const rows = item.cac_menh_de.map((md, idx) => {
-                        const mdDaXuLy = parseLaTeXText(md.noi_dung);
-                        return `
-                        <tr>
-                            <td style="padding:10px; border:1px solid #e2e8f0;">${mdDaXuLy}</td>
-                            <td style="text-align:center; border:1px solid #e2e8f0;"><input type="radio" name="ds-${item.id}-${idx}" value="true" style="transform: scale(1.3);"> Đ</td>
-                            <td style="text-align:center; border:1px solid #e2e8f0;"><input type="radio" name="ds-${item.id}-${idx}" value="false" style="transform: scale(1.3);"> S</td>
-                        </tr>`;
-                    }).join('');
-                    questionHTML = `<table class="table-tf" style="width:100%; border-collapse:collapse; margin-top:15px;">
-                                        <tr style="background:#3b82f6; color:white;">
-                                            <th style="padding:10px; border:1px solid #e2e8f0;">Mệnh đề</th>
-                                            <th style="padding:10px; border:1px solid #e2e8f0; text-align:center; width:60px;">Đúng</th>
-                                            <th style="padding:10px; border:1px solid #e2e8f0; text-align:center; width:60px;">Sai</th>
-                                        </tr>
-                                        ${rows}
-                                    </table>`;
-                } 
-                // Dạng 3: Trả lời ngắn
-                else if (item.loai_cau === 'tra_loi_ngan') {
-                    questionHTML = `<div style="margin-top: 15px;">
-                                        <input type="text" id="short-${item.id}" class="input-short" placeholder="Nhập đáp án của bạn (VD: 12 hoặc e-1)" style="width:100%; padding:12px; border:2px solid #e2e8f0; border-radius:5px; font-size:16px;">
-                                    </div>`;
-                }
-
-                // --- KIỂM TRA TRẠNG THÁI HOÀN THÀNH ---
-                let isCompleted = completedIds.includes(item.id);
-                let cardClass = isCompleted ? "card completed" : "card";
-                let defaultFeedback = isCompleted ? '<span style="color:var(--success); font-weight:bold;">✅ Bạn đã làm đúng câu này!</span>' : '';
-
-                // --- VIDEO YOUTUBE ---
-                let youtubeHTML = '';
-                if (item.youtube_id && item.youtube_id !== "") {
-                    youtubeHTML = `<div class="video-container" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; margin-top:15px;">
-                                       <iframe style="position:absolute; top:0; left:0; width:100%; height:100%;" src="https://www.youtube.com/embed/${item.youtube_id}" allowfullscreen></iframe>
-                                   </div>`;
-                }
-
-                // --- GÓI HTML VÀO THẺ CARD ---
-                const cardHTML = `
-                    <div id="card-${item.id}" class="${cardClass}" style="background:white; padding:25px; border-radius:10px; box-shadow:0 4px 6px rgba(0,0,0,0.05); margin-bottom:25px; border: 1px solid #e2e8f0;">
-                        <div class="question" style="font-size:1.1rem; margin-bottom:15px;">
-                            <strong>Bài toán:</strong> ${cauHoiDaXuLy} 
-                        </div>
-                        
-                        ${questionHTML}
-                        
-                        <div class="btn-group" style="margin-top:20px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                            <button class="check-btn" onclick="checkAnswer('${item.id}', '${item.loai_cau}')" style="background:#10b981; color:white; border:none; padding:10px 20px; border-radius:5px; font-weight:bold; cursor:pointer;">Kiểm tra đáp án</button>
-                            <button class="solution-btn" onclick="toggleSolution('${item.id}')" style="background:#3b82f6; color:white; border:none; padding:10px 20px; border-radius:5px; font-weight:bold; cursor:pointer;">Xem lời giải</button>
-                            <span id="feedback-${item.id}" class="feedback-msg">${defaultFeedback}</span>
-                        </div>
-                        
-                        <div class="solution-content" id="sol-${item.id}" style="display:none; margin-top:20px; padding:20px; background:#f0fdf4; border-left:4px solid #10b981; border-radius:0 5px 5px 0;">
-                            <h4 style="color:#10b981; margin-bottom:10px;">Lời giải chi tiết:</h4>
-                            <div>${loiGiaiDaXuLy}</div>
-                            ${youtubeHTML}
-                        </div>
-                    </div>
-                `;
-
-                if (item.ky_thi === 'THPT') containerTHPT.innerHTML += cardHTML;
-                else if (item.ky_thi === 'DGNL') containerDGNL.innerHTML += cardHTML;
-            });
-
-            // Sau khi Render HTML xong, gọi MathJax để vẽ công thức Toán
             if (window.MathJax) MathJax.typesetPromise();
         }
 
-        // --- HÀM KIỂM TRA ĐÁP ÁN ---
-        function checkAnswer(id, type) {
-            const item = problemsData.find(p => p.id === id);
-            const feedbackEl = document.getElementById(`feedback-${id}`);
+        window.checkAnswer = function() {
+            const feedbackEl = document.getElementById('feedback-msg');
             let isCorrect = false;
 
-            if (type === '4_phuong_an') {
-                const selected = document.querySelector(`input[name="q-${id}"]:checked`);
-                if (!selected) return feedbackEl.innerHTML = '<span style="color:#f59e0b; font-weight:bold;">⚠️ Vui lòng chọn 1 đáp án!</span>';
-                if (selected.value === item.dap_an) isCorrect = true;
+            if (currentProblem.loai_cau === '4_phuong_an') {
+                const selected = document.querySelector(`input[name="q"]:checked`);
+                if (!selected) return feedbackEl.innerHTML = '<span style="color:#f59e0b;">⚠️ Vui lòng chọn 1 đáp án!</span>';
+                if (selected.value === currentProblem.dap_an) isCorrect = true;
             } 
-            else if (type === 'dung_sai') {
+            else if (currentProblem.loai_cau === 'dung_sai') {
                 let correctCount = 0; let allAnswered = true;
-                item.cac_menh_de.forEach((md, idx) => {
-                    const selected = document.querySelector(`input[name="ds-${id}-${idx}"]:checked`);
+                currentProblem.cac_menh_de.forEach((md, idx) => {
+                    const selected = document.querySelector(`input[name="ds-${idx}"]:checked`);
                     if (!selected) allAnswered = false;
-                    else { if ((selected.value === 'true') === md.dap_an) correctCount++; }
+                    else if ((selected.value === 'true') === md.dap_an) correctCount++;
                 });
-                if (!allAnswered) return feedbackEl.innerHTML = '<span style="color:#f59e0b; font-weight:bold;">⚠️ Vui lòng chọn Đ/S cho tất cả mệnh đề!</span>';
-                if (correctCount === item.cac_menh_de.length) isCorrect = true;
-                else return feedbackEl.innerHTML = `<span style="color:#ef4444; font-weight:bold;">❌ Đúng ${correctCount}/${item.cac_menh_de.length} ý. Thử lại nhé!</span>`;
+                if (!allAnswered) return feedbackEl.innerHTML = '<span style="color:#f59e0b;">⚠️ Vui lòng chọn Đ/S cho tất cả mệnh đề!</span>';
+                if (correctCount === currentProblem.cac_menh_de.length) isCorrect = true;
+                else return feedbackEl.innerHTML = `<span style="color:#ef4444;">❌ Bạn làm đúng ${correctCount}/${currentProblem.cac_menh_de.length} ý.</span>`;
             } 
-            else if (type === 'tra_loi_ngan') {
-                const inputVal = document.getElementById(`short-${id}`).value.trim();
-                if (inputVal === '') return feedbackEl.innerHTML = '<span style="color:#f59e0b; font-weight:bold;">⚠️ Vui lòng nhập đáp án!</span>';
-                if (inputVal.toLowerCase().replace(/\s/g, '') === item.dap_an_ngan.toLowerCase().replace(/\s/g, '')) isCorrect = true;
+            else if (currentProblem.loai_cau === 'tra_loi_ngan') {
+                const inputVal = document.getElementById(`user-answer`).value.trim();
+                if (inputVal === '') return feedbackEl.innerHTML = '<span style="color:#f59e0b;">⚠️ Vui lòng nhập đáp án!</span>';
+                if (inputVal.toLowerCase().replace(/\s/g, '') === currentProblem.dap_an_ngan.toLowerCase().replace(/\s/g, '')) isCorrect = true;
             }
 
             if (isCorrect) {
-                feedbackEl.innerHTML = '<span style="color:var(--success); font-weight:bold;">🎉 Chính xác! Bạn làm rất tốt!</span>';
-                saveCompletedProblem(id);
-                // Tạo hiệu ứng hoàn thành (đổi viền xanh)
-                document.getElementById(`card-${id}`).style.borderColor = '#10b981';
+                feedbackEl.innerHTML = '<span style="color:#10b981;">🎉 Chính xác! Bạn làm rất tốt!</span>';
+                
+                // Lưu trạng thái hoàn thành vào LocalStorage
+                let saved = localStorage.getItem('toan_completed');
+                let completed = saved ? JSON.parse(saved) : [];
+                if (!completed.includes(currentProblem.id)) {
+                    completed.push(currentProblem.id);
+                    localStorage.setItem('toan_completed', JSON.stringify(completed));
+                }
             } else {
-                feedbackEl.innerHTML = '<span style="color:#ef4444; font-weight:bold;">❌ Sai rồi, thử lại nhé!</span>';
+                feedbackEl.innerHTML = '<span style="color:#ef4444;">❌ Sai rồi, bạn hãy tính toán lại nhé!</span>';
             }
-        }
+        };
 
-        // --- HÀM ẨN/HIỆN LỜI GIẢI ---
-        function toggleSolution(id) {
-            const solDiv = document.getElementById(`sol-${id}`);
-            solDiv.style.display = solDiv.style.display === "block" ? "none" : "block";
-        }
-
-        // --- HÀM CHUYỂN ĐỔI TAB ---
-        function openTab(evt, tabName) {
-            let i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) tabcontent[i].style.display = "none";
-            tablinks = document.getElementsByClassName("tablinks");
-            for (i = 0; i < tablinks.length; i++) tablinks[i].className = tablinks[i].className.replace(" active", "");
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
-        }
-
-        // Mở sẵn Tab mặc định khi vừa vào web
-        document.getElementById("defaultOpen").click();
+        window.toggleSolution = function() {
+            const solBox = document.getElementById('loi-giai');
+            solBox.style.display = (solBox.style.display === 'none' || solBox.style.display === '') ? 'block' : 'none';
+        };
     </script>
 </body>
 </html>
