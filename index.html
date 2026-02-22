@@ -96,48 +96,40 @@
                 document.getElementById('activeProblemArea').innerHTML = '<h3 style="color:red; text-align:center;">❌ Lỗi đọc file data.json! Kiểm tra lại cú pháp.</h3>';
             });
 
-        // --- 2. HÀM DỊCH LATEX (ĐÃ TÍCH HỢP IN ĐẬM, IN NGHIÊNG & BỘ LỌC TOÁN) ---
+        // --- 2. HÀM DỊCH LATEX (ĐÃ FIX LỖI TEXTBF, TEXTIT) ---
         function parseLaTeXText(text) {
             if (!text) return "";
             
             // Bước 1: Dịch các danh sách (itemize, enumerate)
+            // Dùng \\+ để bất chấp việc có bao nhiêu dấu gạch chéo trong JSON
             text = text
-                .replace(/\\begin\{itemize\}/g, "<ul class='latex-list'>")
-                .replace(/\\end\{itemize\}/g, "</ul>")
-                .replace(/\\begin\{enumerate\}/g, "<ol class='latex-list'>")
-                .replace(/\\end\{enumerate\}/g, "</ol>")
-                .replace(/\\item/g, "<li>");
+                .replace(/\\+begin\{itemize\}/g, "<ul class='latex-list'>")
+                .replace(/\\+end\{itemize\}/g, "</ul>")
+                .replace(/\\+begin\{enumerate\}/g, "<ol class='latex-list'>")
+                .replace(/\\+end\{enumerate\}/g, "</ol>")
+                .replace(/\\+item/g, "<li>");
 
-            // Bước 2: THUẬT TOÁN BẢO VỆ TOÁN HỌC
-            // Cập nhật Regex để nhận diện cả toán nội tuyến $...$ và các khối toán lớn
-            const mathRegex = /(\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\\begin\{[a-zA-Z*]+\}[\s\S]*?\\end\{[a-zA-Z*]+\}|\$[^$]+\$)/g;
-            
-            // Băm nhỏ bài toán thành các phân đoạn
+            // Bước 2: BẢO VỆ TOÁN HỌC VÀ DỊCH TEXT
+            const mathRegex = /(\$\$[\s\S]*?\$\$|\\+\[[\s\S]*?\\+\]|\\+begin\{[a-zA-Z*]+\}[\s\S]*?\\+end\{[a-zA-Z*]+\}|\$[^$]+\$)/g;
             const parts = text.split(mathRegex);
             
             for (let i = 0; i < parts.length; i++) {
-                // Trong mảng parts sinh ra, các vị trí CHẴN (0, 2, 4...) luôn là Văn bản thường.
-                // Các vị trí LẺ (1, 3, 5...) chính là khối Toán học được bảo vệ.
+                // Các vị trí CHẴN (0, 2, 4...) là Văn bản thường
                 if (i % 2 === 0) {
                     let t = parts[i];
                     
-                    // 1. Xóa dấu \\ thừa do enter tự nhiên
+                    // LÀM TRƯỚC: Dịch Textbf, Textit sang HTML
+                    t = t.replace(/\\+textbf\s*\{([\s\S]*?)\}/g, "<strong>$1</strong>");
+                    t = t.replace(/\\+textit\s*\{([\s\S]*?)\}/g, "<em>$1</em>");
+                    t = t.replace(/\\+underline\s*\{([\s\S]*?)\}/g, "<u>$1</u>");
+                    
+                    // LÀM SAU CÙNG: Mới dọn dẹp các dấu gạch chéo xuống dòng (\\) thừa
                     t = t.replace(/\\\\/g, "");
                     
-                    // 2. Dịch \textbf{} -> in đậm
-                    t = t.replace(/\\textbf\{([\s\S]*?)\}/g, "<strong>$1</strong>");
-                    
-                    // 3. Dịch \textit{} -> in nghiêng
-                    t = t.replace(/\\textit\{([\s\S]*?)\}/g, "<em>$1</em>");
-                    
-                    // 4. Dịch \underline{} -> gạch chân (nếu bạn có dùng)
-                    t = t.replace(/\\underline\{([\s\S]*?)\}/g, "<u>$1</u>");
-
                     parts[i] = t;
                 }
             }
             
-            // Ghép nối các mảnh lại nguyên vẹn như cũ
             return parts.join("");
         }
 
@@ -323,6 +315,7 @@
     </script>
 </body>
 </html>
+
 
 
 
