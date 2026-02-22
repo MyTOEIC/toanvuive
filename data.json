@@ -76,5 +76,15 @@
   "dap_an_ngan": "-33",
   "loi_giai": "Từ giả thiết ta có \n\\begin{align*}\n\\Vec{u} = [\\overrightarrow{n_\\alpha}, \\overrightarrow{n_\\beta}] = (-6;-5;-4) \\parallel (a;b;-12) \\implies \\begin{cases}\na=-18 \\\\\nb=15\n\\end{cases} \\implies a+b=-33\n\\end{align*}",
   "youtube_id": ""
+},
+  {
+  "id": "bai-1771769851658",
+  "ky_thi": "THPT" "DGNL",
+  "loai_cau": "tra_loi_ngan",
+  "cau_hoi": "Tính diện tích hình phẳng được giới hạn bởi đồ thị hàm số $y = x^3 + 2x - 2026$ và đường thẳng $y = 6x - 2026$.",
+  "dap_an_ngan": "8",
+  "loi_giai": "Phương trình hoành độ giao điểm \n\\begin{align*}\nx^3+2x-2026=6x-2026 \\Longleftrightarrow x^3-4x=0 \\Longleftrightarrow x =0 \\vee x=\\pm 2\n\\end{align*}\nDiện tích hình phẳng cần tìm là \n\\begin{align*}\nS = \\int_{-2}^2 |(x^3-2x+2026)-(6x-2026)|dx = \\int_{-2}^2 |x^3-4x|dx=8.\n\\end{align*}",
+  "youtube_id": ""
 }
 ]
+
