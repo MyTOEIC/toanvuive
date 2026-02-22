@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết Bài Toán</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <a href="index.html" class="back-btn">← Trở về danh sách</a>
+
+        <div id="noidung-hienthi">
+            <h2 style="text-align:center;">Đang tải nội dung...</h2>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const baiId = urlParams.get('id');
+        const container = document.getElementById('noidung-hienthi');
+
+        if (!baiId) {
+            container.innerHTML = '<h2>❌ Liên kết không hợp lệ!</h2>';
+        } else {
+            fetch('data.json')
+                .then(response => response.json())
+                .then(data => {
+                    const baiToan = data.find(item => item.id === baiId);
+
+                    if (baiToan) {
+                        container.innerHTML = `
+                            <div class="content-box">
+                                <div class="badges">
+                                    <span class="badge badge-blue">${baiToan.ky_thi}</span>
+                                </div>
+                                <h2 class="question-title">Nội dung câu hỏi</h2>
+                                <div class="question-content">${baiToan.cau_hoi}</div>
+                            </div>
+                            
+                            <button class="btn-solve" onclick="toggleSolution()">📝 Xem đáp án & Lời giải chi tiết</button>
+                            
+                            <div id="loi-giai" class="solution-box">
+                                <h3>Đáp án: ${baiToan.dap_an_ngan}</h3>
+                                <hr style="border: 0; border-top: 1px dashed #a7f3d0; margin: 16px 0;">
+                                <div class="solution-content">${baiToan.loi_giai}</div>
+                            </div>
+                        `;
+                    } else {
+                        container.innerHTML = '<h2>❌ Không tìm thấy bài toán trong hệ thống.</h2>';
+                    }
+                })
+                .catch(err => {
+                    container.innerHTML = '<h2>❌ Không kết nối được cơ sở dữ liệu.</h2>';
+                });
+        }
+
+        // Hàm ẩn/hiện lời giải mượt mà
+        function toggleSolution() {
+            const solBox = document.getElementById('loi-giai');
+            if(solBox.style.display === 'none' || solBox.style.display === '') {
+                solBox.style.display = 'block';
+            } else {
+                solBox.style.display = 'none';
+            }
+        }
+    </script>
+
+</body>
+</html>
