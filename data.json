@@ -67,31 +67,14 @@
   "dap_an_ngan": "36",
   "loi_giai": "Ta có:\n$f(x) = (2 \\tan x - \\cot x)^2 = 4 \\tan^2 x - 4 \\tan x \\cot x + \\cot^2 x = 4 \\tan^2 x - 4 + \\cot^2 x$ \\\\\nÁp dụng các công thức $\\tan^2 x = \\dfrac{1}{\\cos^2x} - 1$ và $\\cot^2 x = \\dfrac{1}{\\sin^2x} - 1$ ta được \n\\begin{align*}\nf(x) & = 4 \\left(\\dfrac{1}{\\cos^2x} - 1 \\right) - 4 + \\left(\\dfrac{1}{\\sin^2x} - 1 \\right) \\\\\n& = \\dfrac{4}{\\cos^2x}+ \\dfrac{1}{\\sin^2x}-9 \n\\end{align*}\nNguyên hàm của $f(x)$ là: \n\\begin{align*}\nF(x) = \\int f(x) dx & = \\int \\left(\\dfrac{4}{\\cos^2x}+ \\dfrac{1}{\\sin^2x}-9 \\right) dx \\\\\n& = 4 \\tan x - \\cot x - 9x + C\n\\end{align*}\nTheo giả thiết, \n\\begin{align*}\n& F\\left(\\dfrac{\\pi}{4}\\right)=3-\\dfrac{9\\pi}{4} \\\\\n\\iff & 4 \\tan\\left(\\dfrac{\\pi}{4}\\right) - \\cot\\left(\\dfrac{\\pi}{4}\\right) - 9\\left(\\dfrac{\\pi}{4}\\right) + C = 3-\\dfrac{9\\pi}{4}  \\\\\n\\iff & 3 - \\dfrac{9\\pi}{4} + C = 3-\\dfrac{9\\pi}{4}\n\\end{align*}\nSuy ra $C=0.$\nVậy $F(x) = 4 \\tan x - \\cot x - 9x$. Suy ra\n$a = 4$, $b = -1$, $c = -9$. \\\\\nGiá trị cần tính là $a \\cdot b \\cdot c = 4 \\cdot (-1) \\cdot (-9) = 36$.",
   "youtube_id": ""
+},
+  {
+  "id": "bai-1771769715040",
+  "ky_thi": "THPT",
+  "loai_cau": "tra_loi_ngan",
+  "cau_hoi": "Trong không gian tọa độ $Oxyz$, cho đường thẳng $(\\Delta)$ là giao tuyến của hai mặt phẳng $(\\alpha):2x - 3z + 5 = 0$ và $(\\beta): x-2y+z-3=0$. Biết vectơ $\\Vec{u} = (a ; b; - 12)$ là một vectơ chỉ phương của đường thẳng $(\\Delta)$, hãy tính tổng $a + b$.",
+  "dap_an_ngan": "-33",
+  "loi_giai": "Từ giả thiết ta có \n\\begin{align*}\n\\Vec{u} = [\\overrightarrow{n_\\alpha}, \\overrightarrow{n_\\beta}] = (-6;-5;-4) \\parallel (a;b;-12) \\implies \\begin{cases}\na=-18 \\\\\nb=15\n\\end{cases} \\implies a+b=-33\n\\end{align*}",
+  "youtube_id": ""
 }
 ]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
