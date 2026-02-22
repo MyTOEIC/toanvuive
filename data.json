@@ -79,7 +79,7 @@
 },
   {
   "id": "bai-1771769851658",
-  "ky_thi": "THPT" "DGNL",
+  "ky_thi": ["THPT", "DGNL"],
   "loai_cau": "tra_loi_ngan",
   "cau_hoi": "Tính diện tích hình phẳng được giới hạn bởi đồ thị hàm số $y = x^3 + 2x - 2026$ và đường thẳng $y = 6x - 2026$.",
   "dap_an_ngan": "8",
@@ -87,5 +87,6 @@
   "youtube_id": ""
 }
 ]
+
 
 
