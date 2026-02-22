@@ -173,7 +173,7 @@
 
             // Lấy danh sách bài thuộc kỳ thi hiện tại và khớp từ khóa
             const filteredData = allProblems.filter(p => {
-                const isMatchKyThi = p.ky_thi === currentKyThi;
+                const isMatchKyThi = p.ky_thi && p.ky_thi.includes(currentKyThi);
                 const isMatchSearch = p.cau_hoi.toLowerCase().includes(searchTerm) || p.id.toLowerCase().includes(searchTerm);
                 return isMatchKyThi && isMatchSearch;
             });
@@ -311,4 +311,5 @@
     </script>
 </body>
 </html>
+
 
