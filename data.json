@@ -84,8 +84,31 @@
   "dap_an_ngan": "33",
   "loi_giai": "",
   "youtube_id": "OAPz6b3OxQ4"
+},
+  {
+  "id": "bai-1771772560487",
+  "ky_thi": [
+    "DGNL"
+  ],
+  "loai_cau": "tra_loi_ngan",
+  "cau_hoi": "Cho hàm số $f(x)$ có đạo hàm trên $\\mathbb{R}$ sao cho $f(4) = 5$, và $\\displaystyle \\int_0^2 x^2 f(2x) dx = 10$.\nKhi đó, $\\displaystyle \\int_0^4 x^3 f'(x) dx = ............$",
+  "dap_an_ngan": "80",
+  "loi_giai": "",
+  "youtube_id": "Mq-bbcxES78"
+},
+  {
+  "id": "bai-1771772641125",
+  "ky_thi": [
+    "DGNL"
+  ],
+  "loai_cau": "tra_loi_ngan",
+  "cau_hoi": "Phương trình $\\log_2 \\dfrac{2x^2 + 2}{5x + 1} = -4x^2 + 10x - 2$ có hai nghiệm $x_1, x_2$ thỏa mãn $x_1 + x_2 = \\dfrac{a}{b}$, với $\\dfrac{a}{b}$ là phân số tối giản và $a, b \\in \\mathbb{N}^*$. Tổng $a + b = \\_\\_\\_\\_\\_\\_\\_\\_$.",
+  "dap_an_ngan": "7",
+  "loi_giai": "",
+  "youtube_id": "cJiTB_CwC5o"
 }
 ]
+
 
 
 
