@@ -110,15 +110,16 @@
   {
   "id": "bai-1771773053393",
   "ky_thi": [
-    "DGNL"
+    "THPT", "DGNL"
   ],
   "loai_cau": "tra_loi_ngan",
   "cau_hoi": "Cho khối chóp $S.ABC$ có đáy $ABC$ là tam giác vuông tại $B, BC=3, SA \\perp (ABC)$ và $SB=6.$ Gọi $E$ là trung điểm của cạnh $SB$. Biết góc giữa hai đường thẳng $SA$ và $CE$ là $60^\\circ$. Tính thể tích của khối chóp đã cho.",
   "dap_an_ngan": "9",
   "loi_giai": "",
-  "youtube_id": "msSmjKZin8U, yC2yDqVDEKU"
+  "youtube_id": ["msSmjKZin8U", "yC2yDqVDEKU"]
 }
 ]
+
 
 
 
