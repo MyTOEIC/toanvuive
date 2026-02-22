@@ -73,7 +73,20 @@
   "loi_giai": "",
   "youtube_id": "TIeTR78GRoY"
 },
+  {
+  "id": "bai-1771771887207",
+  "ky_thi": [
+    "THPT",
+    "DGNL"
+  ],
+  "loai_cau": "tra_loi_ngan",
+  "cau_hoi": "Cho đa giác đều 36 đỉnh $A_1A_2...A_{36}$ nội tiếp đường tròn tâm $O$. Chọn ngẫu nhiên 3 đỉnh trong số các đỉnh $A_1, A_2, ..., A_{36}$ của đa giác đã cho, biết xác suất để chọn được ba đỉnh tạo thành một tam giác có một góc bằng $120^\\circ$ là $P$. Giá trị biểu thức $595P$ bằng bao nhiêu?",
+  "dap_an_ngan": "33",
+  "loi_giai": "",
+  "youtube_id": "OAPz6b3OxQ4"
+}
 ]
+
 
 
 
