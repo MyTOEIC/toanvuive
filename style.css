@@ -51,3 +51,21 @@ a { text-decoration: none; color: inherit; }
 .solution-box h3 { color: var(--success); margin-bottom: 12px; }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+/* --- TABS GIAO DIỆN --- */
+.tab { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; }
+.tablinks { background-color: white; border: 2px solid var(--primary-color); color: var(--primary-color); padding: 10px 24px; font-size: 16px; font-weight: bold; border-radius: 30px; cursor: pointer; transition: 0.3s; }
+.tablinks:hover { background-color: #eff6ff; }
+.tablinks.active { background-color: var(--primary-color); color: white; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4); }
+
+/* --- GIAO DIỆN CÁC DẠNG CÂU HỎI --- */
+.options-4 { list-style: none; padding: 0; }
+.options-4 li { background: #f8fafc; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--border-color); transition: 0.2s; }
+.options-4 li:hover { background: #eff6ff; border-color: var(--primary-color); }
+.options-4 label { display: block; padding: 15px; cursor: pointer; font-size: 1.1rem; }
+.options-4 input { margin-right: 10px; transform: scale(1.2); }
+
+.table-tf { width: 100%; border-collapse: collapse; margin-bottom: 20px; background: white; }
+.table-tf th, .table-tf td { border: 1px solid var(--border-color); padding: 12px; text-align: left; }
+.table-tf th { background: var(--primary-color); color: white; font-size: 1.1rem; }
+.table-tf .center { text-align: center; }
+.table-tf input { transform: scale(1.3); cursor: pointer; }
