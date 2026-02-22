@@ -5,48 +5,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hệ Thống Luyện Thi Toán</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
 
     <div class="container">
         <div class="header">
             <h1>Kho Tàng Bài Tập Toán</h1>
-            <p>Tuyển tập các bài toán từ cơ bản đến nâng cao</p>
+            <p>Tuyển tập các bài toán chất lượng cao</p>
+        </div>
+
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'THPT')" id="defaultOpen">Kỳ thi THPT Quốc Gia</button>
+            <button class="tablinks" onclick="openTab(event, 'DGNL')">Đánh Giá Năng Lực</button>
         </div>
 
         <div class="grid-container" id="danh-sach">
-            <p style="text-align: center; width: 100%;">Đang tải dữ liệu, vui lòng đợi...</p>
+            <p style="text-align: center; width: 100%;">Đang tải dữ liệu...</p>
         </div>
     </div>
 
     <script>
-        fetch('data.json')
-            .then(response => response.json())
-            .then(data => {
-                const container = document.getElementById('danh-sach');
-                container.innerHTML = ''; 
-                
-                data.forEach((bai, index) => {
-                    // Tạo một thẻ card cho mỗi bài
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.innerHTML = `
-                        <div>
-                            <div class="badges">
-                                <span class="badge badge-blue">${bai.ky_thi}</span>
-                                <span class="badge badge-gray">${bai.loi_cau}</span>
-                            </div>
-                            <div class="card-title">Bài toán số ${index + 1}</div>
-                        </div>
-                        <a href="chitiet.html?id=${bai.id}" class="btn-outline">Vào làm bài →</a>
-                    `;
-                    container.appendChild(card);
-                });
-            })
-            .catch(err => {
-                document.getElementById('danh-sach').innerHTML = '<p>❌ Lỗi truy xuất dữ liệu. Bạn nhớ mở bằng Live Server nhé!</p>';
-            });
-    </script>
+        let allData = [];
 
+        // Tải dữ liệu 1 lần
+        fetch('data.json')
+            .then(res => res.json())
+            .then(data => {
+                allData = data;
+                document.getElementById("defaultOpen").click(); // Mặc định mở tab THPT
+            });
+
+        // Hàm chuyển Tab và Lọc dữ liệu
+        function openTab(evt, kyThi) {
+            // Đổi hiệu ứng nút Tab
+            const tablinks = document.getElementsByClassName("tablinks");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            evt.currentTarget.classList.add("active");
+
+            // Lọc và Render bài toán
+            const container = document.getElementById('danh-sach');
+            container.innerHTML = '';
+            
+            const filteredData = allData.filter(bai => bai.ky_thi === kyThi);
+
+            if (filteredData.length === 0) {
+                container.innerHTML = '<p style="text-align:center; width:100%;">Chưa có bài toán nào trong chuyên mục này.</p>';
+                return;
+            }
+
+            filteredData.forEach((bai, index) => {
+                let tenDang = "Trả lời ngắn";
+                if(bai.loai_cau === "4_phuong_an") tenDang = "Trắc nghiệm 4 đáp án";
+                if(bai.loai_cau === "dung_sai") tenDang = "Trắc nghiệm Đúng/Sai";
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div>
+                        <div class="badges">
+                            <span class="badge badge-gray">${tenDang}</span>
+                        </div>
+                        <div class="card-title">Bài toán số ${index + 1}</div>
+                    </div>
+                    <a href="chitiet.html?id=${bai.id}" class="btn-outline">Vào làm bài →</a>
+                `;
+                container.appendChild(card);
+            });
+
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+    </script>
 </body>
 </html>
