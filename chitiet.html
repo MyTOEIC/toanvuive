@@ -1,71 +1,137 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chi tiết Bài Toán</title>
+    <title>Làm Bài Chi Tiết</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
 
     <div class="container">
         <a href="index.html" class="back-btn">← Trở về danh sách</a>
-
-        <div id="noidung-hienthi">
-            <h2 style="text-align:center;">Đang tải nội dung...</h2>
-        </div>
+        <div id="noidung-hienthi"><h2 style="text-align:center;">Đang tải nội dung...</h2></div>
     </div>
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const baiId = urlParams.get('id');
-        const container = document.getElementById('noidung-hienthi');
+        let currentProblem = null;
 
         if (!baiId) {
-            container.innerHTML = '<h2>❌ Liên kết không hợp lệ!</h2>';
+            document.getElementById('noidung-hienthi').innerHTML = '<h2>❌ Liên kết không hợp lệ!</h2>';
         } else {
             fetch('data.json')
-                .then(response => response.json())
+                .then(res => res.json())
                 .then(data => {
-                    const baiToan = data.find(item => item.id === baiId);
-
-                    if (baiToan) {
-                        container.innerHTML = `
-                            <div class="content-box">
-                                <div class="badges">
-                                    <span class="badge badge-blue">${baiToan.ky_thi}</span>
-                                </div>
-                                <h2 class="question-title">Nội dung câu hỏi</h2>
-                                <div class="question-content">${baiToan.cau_hoi}</div>
-                            </div>
-                            
-                            <button class="btn-solve" onclick="toggleSolution()">📝 Xem đáp án & Lời giải chi tiết</button>
-                            
-                            <div id="loi-giai" class="solution-box">
-                                <h3>Đáp án: ${baiToan.dap_an_ngan}</h3>
-                                <hr style="border: 0; border-top: 1px dashed #a7f3d0; margin: 16px 0;">
-                                <div class="solution-content">${baiToan.loi_giai}</div>
-                            </div>
-                        `;
-                    } else {
-                        container.innerHTML = '<h2>❌ Không tìm thấy bài toán trong hệ thống.</h2>';
-                    }
-                })
-                .catch(err => {
-                    container.innerHTML = '<h2>❌ Không kết nối được cơ sở dữ liệu.</h2>';
+                    currentProblem = data.find(item => item.id === baiId);
+                    if (currentProblem) renderGiaoDien(currentProblem);
+                    else document.getElementById('noidung-hienthi').innerHTML = '<h2>❌ Không tìm thấy bài toán.</h2>';
                 });
         }
 
-        // Hàm ẩn/hiện lời giải mượt mà
-        function toggleSolution() {
-            const solBox = document.getElementById('loi-giai');
-            if(solBox.style.display === 'none' || solBox.style.display === '') {
-                solBox.style.display = 'block';
-            } else {
-                solBox.style.display = 'none';
-            }
-        }
-    </script>
+        // HÀM RENDER HTML TÙY THEO DẠNG BÀI
+        function renderGiaoDien(baiToan) {
+            let formKiemTra = '';
 
+            // 1. Dạng Trắc nghiệm 4 phương án
+            if (baiToan.loai_cau === '4_phuong_an') {
+                const lis = baiToan.lua_chon.map(opt => `<li><label><input type="radio" name="q" value="${opt.charAt(0)}"> ${opt}</label></li>`).join('');
+                formKiemTra = `<div class="answer-section"><h3>Chọn đáp án đúng:</h3><ul class="options-4">${lis}</ul></div>`;
+            } 
+            // 2. Dạng Đúng/Sai
+            else if (baiToan.loai_cau === 'dung_sai') {
+                const rows = baiToan.cac_menh_de.map((md, idx) => `
+                    <tr>
+                        <td>${md.noi_dung}</td>
+                        <td class="center"><input type="radio" name="ds-${idx}" value="true"></td>
+                        <td class="center"><input type="radio" name="ds-${idx}" value="false"></td>
+                    </tr>`).join('');
+                formKiemTra = `<div class="answer-section"><h3>Chọn Đúng/Sai cho từng mệnh đề:</h3>
+                               <table class="table-tf"><tr><th>Mệnh đề</th><th class="center">Đúng</th><th class="center">Sai</th></tr>${rows}</table></div>`;
+            } 
+            // 3. Dạng Trả lời ngắn
+            else if (baiToan.loai_cau === 'tra_loi_ngan') {
+                formKiemTra = `
+                    <div class="answer-section">
+                        <h3>Nhập đáp án của bạn:</h3>
+                        <div class="answer-flex">
+                            <input type="text" id="user-answer" class="answer-input" placeholder="Nhập kết quả...">
+                        </div>
+                    </div>`;
+            }
+
+            // Xử lý Video YouTube
+            let videoYouTube = (baiToan.youtube_id && baiToan.youtube_id !== "") 
+                ? `<div class="video-container"><iframe src="https://www.youtube.com/embed/${baiToan.youtube_id}" allowfullscreen></iframe></div>` 
+                : '';
+
+            // Bơm vào màn hình
+            document.getElementById('noidung-hienthi').innerHTML = `
+                <div class="content-box">
+                    <div class="badges"><span class="badge badge-blue">${baiToan.ky_thi}</span></div>
+                    <h2 class="question-title">Nội dung câu hỏi</h2>
+                    <div class="question-content">${baiToan.cau_hoi}</div>
+                </div>
+                
+                ${formKiemTra}
+                
+                <div style="display:flex; gap:10px; margin-bottom:24px;">
+                    <button class="btn-check" onclick="checkAnswer()" style="flex:1;">Kiểm Tra Đáp Án</button>
+                    <button class="btn-solve" onclick="toggleSolution()" style="flex:1; margin:0; background:#64748b;">Xem Lời Giải</button>
+                </div>
+                
+                <div id="feedback-msg" class="feedback-msg" style="margin-bottom: 20px; text-align:center;"></div>
+                
+                <div id="loi-giai" class="solution-box">
+                    <h3>Thông tin chi tiết</h3>
+                    <hr style="border: 0; border-top: 1px dashed #a7f3d0; margin: 16px 0;">
+                    <div class="solution-content">${baiToan.loi_giai}</div>
+                    ${videoYouTube}
+                </div>
+            `;
+
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        // HÀM KIỂM TRA ĐÁP ÁN
+        window.checkAnswer = function() {
+            const feedbackEl = document.getElementById('feedback-msg');
+            let isCorrect = false;
+
+            if (currentProblem.loai_cau === '4_phuong_an') {
+                const selected = document.querySelector(`input[name="q"]:checked`);
+                if (!selected) return feedbackEl.innerHTML = '<span style="color:#f59e0b;">⚠️ Vui lòng chọn 1 đáp án!</span>';
+                if (selected.value === currentProblem.dap_an) isCorrect = true;
+            } 
+            else if (currentProblem.loai_cau === 'dung_sai') {
+                let correctCount = 0; let allAnswered = true;
+                currentProblem.cac_menh_de.forEach((md, idx) => {
+                    const selected = document.querySelector(`input[name="ds-${idx}"]:checked`);
+                    if (!selected) allAnswered = false;
+                    else if ((selected.value === 'true') === md.dap_an) correctCount++;
+                });
+                if (!allAnswered) return feedbackEl.innerHTML = '<span style="color:#f59e0b;">⚠️ Vui lòng chọn Đ/S cho tất cả mệnh đề!</span>';
+                
+                if (correctCount === currentProblem.cac_menh_de.length) isCorrect = true;
+                else return feedbackEl.innerHTML = `<span style="color:var(--danger);">❌ Bạn làm đúng ${correctCount}/${currentProblem.cac_menh_de.length} ý.</span>`;
+            } 
+            else if (currentProblem.loai_cau === 'tra_loi_ngan') {
+                const inputVal = document.getElementById(`user-answer`).value.trim();
+                if (inputVal === '') return feedbackEl.innerHTML = '<span style="color:#f59e0b;">⚠️ Vui lòng nhập đáp án!</span>';
+                if (inputVal.toLowerCase().replace(/\s/g, '') === currentProblem.dap_an_ngan.toLowerCase().replace(/\s/g, '')) isCorrect = true;
+            }
+
+            if (isCorrect) feedbackEl.innerHTML = '<span style="color:var(--success);">🎉 Chính xác! Bạn làm rất tốt!</span>';
+            else feedbackEl.innerHTML = '<span style="color:var(--danger);">❌ Sai rồi, bạn hãy tính toán lại nhé!</span>';
+        };
+
+        window.toggleSolution = function() {
+            const solBox = document.getElementById('loi-giai');
+            solBox.style.display = (solBox.style.display === 'none' || solBox.style.display === '') ? 'block' : 'none';
+        };
+    </script>
 </body>
 </html>
