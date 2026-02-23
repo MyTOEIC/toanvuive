@@ -139,8 +139,21 @@
   "dap_an_ngan": "698",
   "loi_giai": "",
   "youtube_id": "MWV8hiEwt6A"
+},
+  {
+  "id": "bai-1771866090594",
+  "ky_thi": [
+    "THPT",
+    "DGNL"
+  ],
+  "loai_cau": "tra_loi_ngan",
+  "cau_hoi": "Cho một bảng ô vuông $3 \\times 3$ như hình vẽ bên. Điền ngẫu nhiên $9$ số thuộc tập hợp $X = \\{0; 1; 2; 3; 4; 5; 6; 7; 8; 9\\}$ vào $9$ ô vuông trong bảng (mỗi ô điền một số khác nhau). Gọi $Y$ là biến cố “mỗi hàng, mỗi cột bất kì trong bảng đều có ít nhất một số lẻ”. Biết xác suất $P(Y) = \\dfrac{a}{b}$ (với $a, b \\in \\mathbb{N}$ và $\\dfrac{a}{b}$ là phân số tối giản). Khi đó $a + b$ bằng bao nhiêu?\n\n<div style='text-align: center; margin: 15px 0; display: block; line-height: 0;'><svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='145.612pt' height='95.799pt' viewBox='0 -95.799 145.612 95.799'> <g id='page1'> <g transform='matrix(1 0 0 -1 0 0)'> <path d='M10.359375 .398438H95.4023M10.359375 28.7461H95.4023M10.359375 57.0938H95.4023M10.359375 85.4297H95.4023M10.359375 .398438V85.4375M38.707 .398438V85.4375M67.0547 .398438V85.4375M95.3906 .398438V85.4375' stroke='#000' fill='none' stroke-width='.79701' stroke-miterlimit='10'/> </g> </g> </svg></div>",
+  "dap_an_ngan": "43",
+  "loi_giai": "",
+  "youtube_id": ""
 }
 ]
+
 
 
 
