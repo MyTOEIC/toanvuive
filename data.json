@@ -151,8 +151,21 @@
   "dap_an_ngan": "43",
   "loi_giai": "",
   "youtube_id": ""
+},
+  {
+  "id": "bai-1771868186096",
+  "ky_thi": [
+    "THPT",
+    "DGNL"
+  ],
+  "loai_cau": "tra_loi_ngan",
+  "cau_hoi": "Xét một bảng ô vuông $3 \\times 3$. Người ta điền ngẫu nhiên các số từ 1 đến 9 vào các ô (mỗi số điền vào một ô khác nhau). Tính xác suất để tổng các số trong mỗi hàng và mỗi cột đều là số lẻ. (Viết kết quả dưới dạng số thập phân làm tròn đến hàng phần trăm).b}$ (với $a, b \\in \\mathbb{N}$ và $\\dfrac{a}{b}$ là phân số tối giản). Khi đó $a + b$ bằng bao nhiêu?\n\n<div style='text-align: center; margin: 15px 0; display: block; line-height: 0;'><svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='145.612pt' height='95.799pt' viewBox='0 -95.799 145.612 95.799'> <g id='page1'> <g transform='matrix(1 0 0 -1 0 0)'> <path d='M10.359375 .398438H95.4023M10.359375 28.7461H95.4023M10.359375 57.0938H95.4023M10.359375 85.4297H95.4023M10.359375 .398438V85.4375M38.707 .398438V85.4375M67.0547 .398438V85.4375M95.3906 .398438V85.4375' stroke='#000' fill='none' stroke-width='.79701' stroke-miterlimit='10'/> </g> </g> </svg></div>",
+  "dap_an_ngan": "0,07",
+  "loi_giai": "",
+  "youtube_id": ""
 }
 ]
+
 
 
 
