@@ -185,8 +185,20 @@
   "dap_an_ngan": "303",
   "loi_giai": "",
   "youtube_id": ""
-}
+},
+  {
+  "id": "bai-1772006940493",
+  "ky_thi": [
+    "THPT"
+  ],
+  "loai_cau": "tra_loi_ngan",
+  "cau_hoi": "Cho hình bát giác đều $ABCDEFGH$ nội tiếp đường tròn tâm $O$. Người ta dùng 8 số tự nhiên $\\{1,2, 3,4,5,6,7,8\\}$ để gán vào 8 đỉnh của bát giác sao cho mỗi đỉnh được gán đúng một số khác nhau. Một tam giác được gọi là \"Tam giác Cân Bằng\" nếu nó thỏa mãn đồng thời hai điều kiện:\n\\begin{enumerate}\n\t\\item Là tam giác tù.\n    \\item Tổng các số trên ba đỉnh của tam giác đó là một số chia hết cho 3.\n\\end{enumerate}\nChọn ngẫu nhiên một cách gán số và một tam giác từ các đỉnh của bát giác. Gọi $P$ là xác suất  để chọn được một \"Tam giác Cân Bằng\". Biết $P=\\dfrac{m}{n}$ (phân số tối giản), tính giá trị của $S=n-10m$.",
+  "dap_an_ngan": "-52",
+  "loi_giai": "",
+  "youtube_id": ""
+},
 ]
+
 
 
 
