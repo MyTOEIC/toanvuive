@@ -208,7 +208,20 @@
   "loi_giai": "",
   "youtube_id": "t5c51es3OEg"
 },
+  {
+  "id": "bai-1772008174685",
+  "ky_thi": [
+    "THPT",
+    "DGNL"
+  ],
+  "loai_cau": "tra_loi_ngan",
+  "cau_hoi": "Tiến hành xếp 3 cô gái ($G_1; G_2; G_3$) và 6 chàng trai vào 9 chiếc ghế hàng ngang sao cho ba cô gái ngồi theo đúng thứ tự $G_1; G_2; G_3$ từ trái sang phải (không nhất thiết phải ngồi kề nhau). Giữa cô gái thứ nhất ($G_1$) và cô gái thứ hai ($G_2$) có ít nhất một chàng trai, giữa cô gái thứ hai ($G_2$) và cô gái thứ ba ($G_3$) có tối đa hai chàng trai. Gọi $T$ là số cách xếp thỏa mãn. Tính $\\dfrac{T}{80}$.",
+  "dap_an_ngan": "414",
+  "loi_giai": "",
+  "youtube_id": ""
+}
 ]
+
 
 
 
