@@ -197,7 +197,19 @@
   "loi_giai": "",
   "youtube_id": ""
 },
+  {
+  "id": "bai-1772007166978",
+  "ky_thi": [
+    "THPT"
+  ],
+  "loai_cau": "tra_loi_ngan",
+  "cau_hoi": "Một hộp đựng $20$ lá thăm khác nhau được đánh số từ $1$ đến $20$. Chọn ngẫu nhiên đồng thời $4$ lá thăm từ hộp. Tính xác suất để trong $4$ lá thăm được chọn có ít nhất $2$ lá thăm là số nguyên tố và tổng của $4$ số đó là một số chẵn. (Làm tròn đến hàng phần trăm).",
+  "dap_an_ngan": "0,28",
+  "loi_giai": "",
+  "youtube_id": "t5c51es3OEg"
+},
 ]
+
 
 
 
